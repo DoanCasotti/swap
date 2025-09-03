@@ -1,0 +1,38 @@
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# Environment Variables
+.env
+
+# Build Output
+dist/
+build/
+
+# IDE/Editor Configurations
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Jest Coverage
+coverage/
+
+# Kubernetes Manifests (if generated dynamically)
+*.yaml
+
+# Docker
+docker-compose.override.yml
+*.env

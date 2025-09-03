@@ -76,6 +76,116 @@ fintech-platform/
 │   ├── test.sh
 │   └── cleanup.sh
 └── README.md
+
+Templates Básicos
+Para facilitar o início do projeto, fornecemos templates básicos para os principais componentes:
+
+1. **Crossplane Composition**:
+   ```yaml
+   apiVersion: apiextensions.crossplane.io/v1
+   kind: Composition
+   metadata:
+     name: fintech-platform
+   spec:
+     compositeTypeRef:
+       apiVersion: platform.fintech/v1alpha1
+       kind: FintechPlatform
+     resources:
+       - name: vpc
+         base:
+           apiVersion: ec2.aws.crossplane.io/v1beta1
+           kind: VPC
+           spec:
+             forProvider:
+               cidrBlock: "10.0.0.0/16"
+   ```
+
+2. **Kubernetes Deployment**:
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: transaction-api
+   spec:
+     replicas: 2
+     selector:
+       matchLabels:
+         app: transaction-api
+     template:
+       metadata:
+         labels:
+           app: transaction-api
+       spec:
+         containers:
+           - name: transaction-api
+             image: your-dockerhub/transaction-api:latest
+             ports:
+               - containerPort: 8080
+   ```
+
+3. **Dockerfile**:
+   ```dockerfile
+   FROM node:16-alpine AS builder
+   WORKDIR /app
+   COPY package*.json ./
+   RUN npm install
+   COPY . .
+   RUN npm run build
+
+   FROM node:16-alpine
+   WORKDIR /app
+   COPY --from=builder /app/dist ./dist
+   CMD ["node", "dist/index.js"]
+   ```
+
+Etapas Sugeridas
+Para facilitar a execução, siga estas etapas:
+1. Configure o Crossplane e provisione a infraestrutura base.
+2. Desenvolva e teste os microserviços localmente.
+3. Crie os manifests do Kubernetes e implemente no cluster.
+4. Configure observabilidade e segurança.
+5. Documente troubleshooting e finalize a entrega.
+
+Exemplos de APIs
+1. **Transaction API**:
+   - `POST /transactions`:
+     ```json
+     {
+       "user_id": "123",
+       "amount": 100.50,
+       "currency": "USD"
+     }
+     ```
+   - `GET /transactions/{id}`:
+     ```json
+     {
+       "id": "txn_001",
+       "user_id": "123",
+       "amount": 100.50,
+       "currency": "USD",
+       "status": "completed"
+     }
+     ```
+
+2. **Notification Service**:
+   - `POST /notify`:
+     ```json
+     {
+       "user_id": "123",
+       "message": "Transaction completed successfully."
+     }
+     ```
+   - `GET /notifications/{user_id}`:
+     ```json
+     [
+       {
+         "id": "notif_001",
+         "user_id": "123",
+         "message": "Transaction completed successfully."
+       }
+     ]
+     ```
+
 Critérios de Avaliação
 Nível Sênior (40% da avaliação)
 Avaliamos arquitetura bem pensada e justificada tecnicamente, compositions avançadas do Crossplane demonstrando conhecimento profundo da ferramenta, implementação de padrões de design modernos e documentação técnica detalhada que demonstre raciocínio arquitetural.

@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/app'); // Ajuste o caminho para o arquivo principal do serviço
+const app = require('../transaction-api/src/app'); // ajustado para o caminho do service
 
 describe('Transaction API', () => {
   it('should create a new transaction', async () => {
@@ -15,7 +15,10 @@ describe('Transaction API', () => {
   });
 
   it('should fetch a transaction by ID', async () => {
-    const transactionId = 'txn_001';
+    const create = await request(app)
+      .post('/transactions')
+      .send({ user_id: '123', amount: 1, currency: 'USD' });
+    const transactionId = create.body.id;
     const response = await request(app).get(`/transactions/${transactionId}`);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('id', transactionId);

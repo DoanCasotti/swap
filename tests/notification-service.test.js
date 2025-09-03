@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/app'); // Ajuste o caminho para o arquivo principal do serviço
+const app = require('../notification-service/src/app'); // ajustado para o caminho do service
 
 describe('Notification Service', () => {
   it('should send a notification', async () => {
@@ -14,10 +14,12 @@ describe('Notification Service', () => {
   });
 
   it('should fetch notifications for a user', async () => {
-    const userId = '123';
-    const response = await request(app).get(`/notifications/${userId}`);
+    await request(app).post('/notify').send({ user_id: '123', message: 'one' });
+    await request(app).post('/notify').send({ user_id: '123', message: 'two' });
+    const response = await request(app).get(`/notifications/123`);
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThanOrEqual(2);
   });
 
   it('should return health status', async () => {

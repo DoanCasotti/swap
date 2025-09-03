@@ -1,4 +1,3 @@
-
 # Node.js
 node_modules/
 npm-debug.log*
@@ -30,9 +29,5 @@ Thumbs.db
 # Jest Coverage
 coverage/
 
-# Kubernetes Manifests (if generated dynamically)
-*.yaml
-
 # Docker
 docker-compose.override.yml
-*.env

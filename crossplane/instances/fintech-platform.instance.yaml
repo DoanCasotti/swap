@@ -1,0 +1,15 @@
+apiVersion: platform.fintech/v1alpha1
+kind: FintechPlatform
+metadata:
+  name: demo-fintech-platform
+spec:
+  vpcCidr: "10.10.0.0/16"
+  publicSubnetCidrs:
+    - "10.10.1.0/24"
+  privateSubnetCidrs:
+    - "10.10.2.0/24"
+  nodeCount: 2
+  dbInstanceClass: db.t3.medium
+  dbAllocatedStorage: 20
+  redisNodeType: cache.t3.small
+  domain: "example.com"   # usado por Route53/Ingress se configurar

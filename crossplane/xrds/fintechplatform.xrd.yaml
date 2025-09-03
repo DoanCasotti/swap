@@ -1,0 +1,43 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: fintechplatforms.platform.fintech
+spec:
+  group: platform.fintech
+  names:
+    kind: FintechPlatform
+    plural: fintechplatforms
+  claimNames:
+    kind: FintechPlatformClaim
+    plural: fintechplatformclaims
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                vpcCidr:
+                  type: string
+                publicSubnetCidrs:
+                  type: array
+                  items:
+                    type: string
+                privateSubnetCidrs:
+                  type: array
+                  items:
+                    type: string
+                nodeCount:
+                  type: integer
+                dbInstanceClass:
+                  type: string
+                dbAllocatedStorage:
+                  type: integer
+                redisNodeType:
+                  type: string
+                domain:
+                  type: string

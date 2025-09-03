@@ -1,0 +1,109 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: fintech-platform
+spec:
+  compositeTypeRef:
+    apiVersion: platform.fintech/v1alpha1
+    kind: FintechPlatform
+  resources:
+    - name: vpc
+      base:
+        # exemplo: VPC gerenciado (verifique apiVersion do seu provider-aws)
+        apiVersion: ec2.aws.crossplane.io/v1beta1
+        kind: VPC
+        spec:
+          forProvider:
+            cidrBlock: "${inputs.vpcCidr}"
+            enableDnsSupport: true
+            enableDnsHostnames: true
+          providerConfigRef:
+            name: aws-provider
+    - name: public-subnet
+      base:
+        apiVersion: ec2.aws.crossplane.io/v1beta1
+        kind: Subnet
+        spec:
+          forProvider:
+            cidrBlock: "${inputs.publicSubnetCidrs[0]}"
+            availabilityZone: "us-east-1a" # Ajuste para uma zona válida
+          providerConfigRef:
+            name: aws-provider
+    - name: private-subnet
+      base:
+        apiVersion: ec2.aws.crossplane.io/v1beta1
+        kind: Subnet
+        spec:
+          forProvider:
+            cidrBlock: "${inputs.privateSubnetCidrs[0]}"
+            availabilityZone: "us-east-1b" # Ajuste para uma zona válida
+          providerConfigRef:
+            name: aws-provider
+    - name: eks-cluster
+      base:
+        apiVersion: eks.aws.crossplane.io/v1beta1
+        kind: Cluster
+        spec:
+          forProvider:
+            roleArn: "arn:aws:iam::123456789012:role/EKSRole" # Ajuste para um ARN válido
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+            name: eks-cluster-conn
+          providerConfigRef:
+            name: aws-provider
+    - name: rds-instance
+      base:
+        apiVersion: rds.aws.crossplane.io/v1beta1
+        kind: DBInstance
+        spec:
+          forProvider:
+            dbInstanceClass: "${inputs.dbInstanceClass}"
+            allocatedStorage: ${inputs.dbAllocatedStorage}
+            engine: "postgres"
+            multiAZ: true
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+            name: fintech-rds-secret
+          providerConfigRef:
+            name: aws-provider
+    - name: redis
+      base:
+        apiVersion: cache.aws.crossplane.io/v1alpha1
+        kind: ReplicationGroup
+        spec:
+          forProvider:
+            replicationGroupDescription: "fintech-redis"
+            cacheNodeType: "${inputs.redisNodeType}"
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+            name: fintech-redis-secret
+          providerConfigRef:
+            name: aws-provider
+    - name: alb
+      base:
+        apiVersion: elbv2.aws.crossplane.io/v1beta1
+        kind: LoadBalancer
+        spec:
+          forProvider:
+            subnets: []
+          providerConfigRef:
+            name: aws-provider
+  patchSets: []
+  # inputs declarados para mapear do CompositeResource
+  parameters:
+    - name: vpcCidr
+      type: string
+      required: true
+    - name: publicSubnetCidrs
+      type: array
+    - name: privateSubnetCidrs
+      type: array
+    - name: dbInstanceClass
+      type: string
+      default: db.t3.medium
+    - name: dbAllocatedStorage
+      type: integer
+      default: 20
+    - name: redisNodeType
+      type: string
+      default: cache.t3.small

@@ -1,0 +1,11 @@
+apiVersion: aws.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: aws-provider
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: crossplane-system
+      name: aws-creds       # ajuste para o nome do secret com suas credenciais
+      key: creds            # ajuste se a chave for diferente

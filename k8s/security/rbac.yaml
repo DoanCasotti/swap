@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: transaction-api
+  namespace: fintech-platform
+  labels:
+    app: fintech-platform
+    component: transaction-api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notification-service
+  namespace: fintech-platform
+  labels:
+    app: fintech-platform
+    component: notification-service
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fintech-app-role
+  namespace: fintech-platform
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: transaction-api-binding
+  namespace: fintech-platform
+subjects:
+- kind: ServiceAccount
+  name: transaction-api
+  namespace: fintech-platform
+roleRef:
+  kind: Role
+  name: fintech-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: notification-service-binding
+  namespace: fintech-platform
+subjects:
+- kind: ServiceAccount
+  name: notification-service
+  namespace: fintech-platform
+roleRef:
+  kind: Role
+  name: fintech-app-role
+  apiGroup: rbac.authorization.k8s.io
